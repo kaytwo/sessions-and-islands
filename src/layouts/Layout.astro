@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro Sessions and Server Islands</title>
+    <script is:inline>
+      // @ts-nocheck
+      let gsiLoadOkay;
+      let gsiLoadFail;
+      const gsiLoadPromise = new Promise((resolve, reject) => {
+        gsiLoadOkay = resolve;
+        gsiLoadFail = reject;
+      });
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script
+      is:inline
+      defer
+      onload="gsiLoadOkay()"
+      onerror="gsiLoadFail()"
+      src="https://accounts.google.com/gsi/client"
+      async></script>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>

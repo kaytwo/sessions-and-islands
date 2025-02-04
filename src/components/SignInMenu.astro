@@ -1,0 +1,31 @@
+---
+import Profile from "./Profile.tsx";
+const href = Astro.url.pathname + Astro.url.search;
+// Tell the browser to cache user's login status, and invalidate it EITHER if 5
+// minutes pass or if the user's cookie changes. Note that changes to cookies
+// besides the astro session cookie will also invalidate the cache entry. You
+// can get rid of that constraint, but the user will show up as logged in after
+// their cookie expires or if they manually delete it without clearing their
+// cache.
+Astro.response.headers.set("Cache-Control", "private, max-age=300");
+Astro.response.headers.set("Vary", "Cookie");
+console.log("props", Astro.props);
+---
+
+<Profile client:load initialUser={Astro.locals.user} />
+
+<cache-invalidator data-href={href}> </cache-invalidator>
+<script>
+  import { setLogoutUrl } from "../lib";
+  class CacheInvalidator extends HTMLElement {
+    connectedCallback() {
+      // This Web Component based data transfer isn't strictly necessary, as the
+      // URL for the SignInMenu Server Island will always be the same. However,
+      // this way you don't need to hard code it into the logout logic, and it
+      // will still work if you e.g. rename the SignInMenu to something else.
+      const thisUrl = this.dataset.href;
+      if (thisUrl) setLogoutUrl(thisUrl);
+    }
+  }
+  customElements.define("cache-invalidator", CacheInvalidator);
+</script>
